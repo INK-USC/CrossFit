@@ -1,6 +1,7 @@
 data/
 daily/
 models/
+tasks/full_datasets
 
 
 # Byte-compiled / optimized / DLL files
