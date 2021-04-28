@@ -41,10 +41,6 @@ class NLPFewshotGymMultiTaskData(object):
                 train_examples = []
                 for line in lines:
                     d = line.strip().split("\t")
-                    if len(d) < 2:
-                        print(prefix)
-                        print(line)
-                        print("train")
                     train_examples.append((d[0], d[1:]))
 
                 with open(os.path.join(task_dir, prefix + "_dev.tsv")) as fin:
@@ -53,10 +49,6 @@ class NLPFewshotGymMultiTaskData(object):
                 dev_examples = []
                 for line in lines:
                     d = line.strip().split("\t")
-                    if len(d) < 2:
-                        print(prefix)
-                        print(line)
-                        print("dev")
                     dev_examples.append((d[0], d[1:]))
 
                 self.data.append({
@@ -118,12 +110,10 @@ class NLPFewshotGymMultiTaskData(object):
                     metadata = json.load(f)
 
         else:
-            print("Start tokenizing ... {} instances".format(len(self.data)))
+            self.logger.info("Start tokenizing ... {} instances".format(len(self.data)))
 
             inputs = []
             outputs = []
-            # dev_inputs = []
-            # dev_outputs = []
 
             for task in self.data:
                 task_name = task["task_name"]
@@ -136,20 +126,13 @@ class NLPFewshotGymMultiTaskData(object):
                         inputs.append(" [{}] {}".format(task_name, dp[0]))
                         outputs.append([" " + item for item in dp[1]])
 
-            print("Printing Examples ...")
-            for i in range(3):
-                print(inputs[i])
-                print(outputs[i])
-                print()
-
             outputs, metadata = self.flatten(outputs) # what is metadata?
 
+            self.logger.info("Printing 3 examples")
             for i in range(3):
-                print(inputs[i])
-                print(outputs[i])
-                print()
-
-            print(metadata[:5])
+                self.logger.info(inputs[i])
+                self.logger.info(outputs[i])
+                self.logger.info()
 
             if self.args.do_lowercase:
                 inputs = [input0.lower() for input0 in inputs]
@@ -158,11 +141,11 @@ class NLPFewshotGymMultiTaskData(object):
                 inputs = ["<s> "+input0 for input0 in inputs]
                 outputs = ["<s> " +output0 for output0 in outputs]
             
-            print("Tokenizing Input ...")
+            self.logger.info("Tokenizing Input ...")
             tokenized_input = tokenizer.batch_encode_plus(inputs,
                                                          pad_to_max_length=True,
                                                          max_length=self.args.max_input_length)
-            print("Tokenizing Output ...")
+            self.logger.info("Tokenizing Output ...")
             tokenized_output = tokenizer.batch_encode_plus(outputs,
                                                        pad_to_max_length=True,
                                                        max_length=self.args.max_output_length)
