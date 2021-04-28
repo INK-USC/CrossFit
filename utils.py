@@ -59,9 +59,6 @@ def trim_batch(
         return (input_ids[:, keep_column_mask], attention_mask[:, keep_column_mask])
 
 def get_tasks_list(filename, split_name):
-    # if filename is None:
-    #     return DEFAULT_SPLIT[split_name]
-    # else:
     with open(filename, "r") as fin:
         split_dict = json.load(fin)
     return split_dict[split_name]
