@@ -7,8 +7,12 @@ This repository contains code accomapnying our preprint paper "CrossFit :weight_
 - [Building the NLP Few-shot Gym](#building-the-nlp-few-shot-gym) :sweat_drops:
 - [Baselines for the CrossFit Challenge](#baseline-methods) :weight_lifting:
   - [Direct Fine-tuning](#fine-tune-a-single-few-shot-task)
+  - [Multi-task Learning](#multi-task-Learning)
+  - [Meta Learning (MAML)](#meta-Learning-maml)
+- [Download Our Checkpoints](#download-our-checkpoints)
 - [Contact Us](#contact-us)
 
+***
 ### Configure Environment
 
 ```bash
@@ -21,7 +25,7 @@ pip install datasets==1.4.0
 pip install torch==1.1.0 higher==0.2.1 scikit-learn==0.24.1 scipy==1.4.1 rouge==1.0.0
 pip install git+https://github.com/huggingface/transformers.git@7b75aa9fa55bee577e2c7403301ed31103125a35
 ```
-
+***
 ### Building the NLP Few-shot Gym
 
 ```bash
@@ -47,7 +51,7 @@ __Disclaimer:__
 We use publicly-available datasets from huggingface datasets to construct the few-shot gym. 
 We do not host or distribute these datasets, vouch for their quality or fairness, or claim that you have license to use the dataset. 
 If you are the owner of the resources we use and wish to remove/update them, please contact us!
-
+***
 ### Baseline Methods
 
 :smiley: Please check `./example_scripts` for more examples!
@@ -70,9 +74,47 @@ python tune_hps_singletask.py \
 --predict_batch_size 32 \
 ```
 
-### Tools for Analyzing Results
+Notes:
+- The script will load the original bart-base weights by default. If you want to fine-tune pre-trained weights from a file, please specify `--checkpoint $CHECKPOINT`.
+- If you want to fine-tune with your own task, please process your data in the same format as in `data/boolq/`.
+
+#### Multi-task Learning
+```bash
+TASK_SPLIT=dataloader/custom_task_splits/default.json
+python cli_multitask.py \
+--do_train \
+--train_dir data \
+--custom_tasks_splits ${TASK_SPLIT} \
+--total_steps 16980 \
+--warmup_steps 1018 \
+--model facebook/bart-base \
+--output_dir models/upstream-multitask \
+--train_batch_size 32 \
+--num_train_epochs 10;
+```
+
+#### Meta-learning (MAML)
+:smiley: Please stay tuned!
+
+***
+
+### Download Our Checkpoints
+| Task Partition | Multi-task | Meta-learn |
+| ----------- | ----------- | ----------- |
+| Default     | [multi-task-default-bart-base.pt](https://drive.google.com/file/d/1jz-hg5hvygeBSDpORw2Vq-a_a0KWfT4y/view?usp=sharing)       | [meta-learn-default-bart-base.pt](https://drive.google.com/file/d/1dPNaScWO3iktB5EZneDWr8ZSNq0DAuvT/view?usp=sharing)
+
+
+:smiley: Please stay tuned for more checkpoints!
+
+***
+### Useful Tools
+:smiley: Please stay tuned!
+
+***
 
 ### Acknowledgment
+
+***
 
 ### Contact Us
 If you find bugs in our code, encounter problems when running the code, or have suggestions for the CrossFit project, please reach out to Qinyuan (qinyuany@usc.edu) and Bill (yuchen.lin@usc.edu)!
@@ -89,6 +131,6 @@ If you used our code in your study, or find our paper useful, please cite us:
 
 ### To-do
 We will update the code as soon as possible!
-- [ ] Fine-tune on a downstream task
-- [ ] Multi-task learning baseline
+- [x] Fine-tune on a downstream task
+- [x] Multi-task learning baseline
 - [ ] Meta-learning baseline
