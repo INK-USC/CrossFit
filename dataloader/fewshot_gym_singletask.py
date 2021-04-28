@@ -25,7 +25,7 @@ class NLPFewshotGymSingleTaskData(object):
         self.data = []
 
         self.task_name = "_".join(self.data_path.split("/")[-1].split("_")[:-3])
-        print(self.task_name)
+        self.logger.info(self.task_name)
 
         with open(data_path) as fin:
             lines = fin.readlines()
@@ -33,12 +33,6 @@ class NLPFewshotGymSingleTaskData(object):
         # train_examples = []
         for line in lines:
             d = line.strip().split("\t")
-            if len(d) < 2:
-                # print(prefix)
-                print(line)
-                print("train")
-            # train_examples.append((d[0], d[1]))
-
             self.data.append((d[0], d[1:]))
             
 
@@ -66,7 +60,6 @@ class NLPFewshotGymSingleTaskData(object):
         return [self.decode(_tokens) for _tokens in tokens]
 
     def flatten(self, answers):
-        # not sure what this means
         new_answers, metadata = [], []
         for answer in answers:
             metadata.append((len(new_answers), len(new_answers)+len(answer)))
@@ -90,22 +83,19 @@ class NLPFewshotGymSingleTaskData(object):
                     metadata = json.load(f)
 
         else:
-            print("Start tokenizing ... {} instances".format(len(self.data)))
+            self.logger.info("Start tokenizing ... {} instances".format(len(self.data)))
 
             inputs = []
             outputs = []
-            # dev_inputs = []
-            # dev_outputs = []
 
             for dp in self.data:
                 inputs.append(" [{}] {}".format(self.task_name, dp[0]))
                 outputs.append(dp[1]) # is a list
 
-            print("Printing Examples ...")
+            self.logger.info("Printing 3 examples")
             for i in range(3):
-                print(inputs[i])
-                print(outputs[i])
-                print()
+                self.logger.info(inputs[i])
+                self.logger.info(outputs[i])
 
             outputs, metadata = self.flatten(outputs) # what is metadata?
 
@@ -116,11 +106,11 @@ class NLPFewshotGymSingleTaskData(object):
                 inputs = ["<s> "+input0 for input0 in inputs]
                 outputs = ["<s> " +output0 for output0 in outputs]
             
-            print("Tokenizing Input ...")
+            self.logger.info("Tokenizing Input ...")
             tokenized_input = tokenizer.batch_encode_plus(inputs,
                                                          pad_to_max_length=True,
                                                          max_length=self.args.max_input_length)
-            print("Tokenizing Output ...")
+            self.logger.info("Tokenizing Output ...")
             tokenized_output = tokenizer.batch_encode_plus(outputs,
                                                        pad_to_max_length=True,
                                                        max_length=self.args.max_output_length)

@@ -132,7 +132,6 @@ class NLPFewshotGymMultiTaskData(object):
             for i in range(3):
                 self.logger.info(inputs[i])
                 self.logger.info(outputs[i])
-                self.logger.info()
 
             if self.args.do_lowercase:
                 inputs = [input0.lower() for input0 in inputs]

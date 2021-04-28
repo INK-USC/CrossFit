@@ -42,10 +42,6 @@ class NLPFewshotGymMetaLearningData(object):
                 train_examples = []
                 for line in lines:
                     d = line.strip().split("\t")
-                    if len(d) < 2:
-                        print(prefix)
-                        print(line)
-                        print("train")
                     train_examples.append((d[0], d[1:]))
 
                 with open(os.path.join(task_dir, prefix + "_dev.tsv")) as fin:
@@ -54,10 +50,6 @@ class NLPFewshotGymMetaLearningData(object):
                 dev_examples = []
                 for line in lines:
                     d = line.strip().split("\t")
-                    if len(d) < 2:
-                        print(prefix)
-                        print(line)
-                        print("dev")
                     dev_examples.append((d[0], d[1:]))
 
                 self.data.append({
@@ -68,17 +60,11 @@ class NLPFewshotGymMetaLearningData(object):
                 })
             
 
-        # if args.debug:
-        #     self.data = self.data[:40]
-        # print(self.data[4])
-
         self.is_training = is_training
-        # self.load = not args.debug
         self.logger = logger
         self.args = args
 
         self.metric = "F1"
-        # self.max_input_length = self.args.max_input_length
         self.tokenizer = None
         self.dataset = None
         self.dataloader = None
@@ -98,7 +84,6 @@ class NLPFewshotGymMetaLearningData(object):
         return [self.decode(_tokens) for _tokens in tokens]
 
     def flatten(self, answers):
-        # not sure what this means
         new_answers, metadata = [], []
         for answer in answers:
             metadata.append((len(new_answers), len(new_answers)+len(answer)))
@@ -129,7 +114,7 @@ class NLPFewshotGymMetaLearningData(object):
                 dev_metadata_task, dev_metadata_questions = json.load(f)
 
         else:
-            print("Start tokenizing ... {} instances".format(len(self.data)))
+            self.logger.info("Start tokenizing ... {} instances".format(len(self.data)))
 
             train_inputs = []
             train_outputs = []
@@ -149,7 +134,6 @@ class NLPFewshotGymMetaLearningData(object):
                     
                 train_st = train_ed
                 train_ed = train_ed + len(task["train_examples"])
-                # train_metadata_questions += [(i, i+1) for i in range(train_st, train_ed)]
                 train_metadata_task.append((train_st, train_ed))
 
 
@@ -159,27 +143,15 @@ class NLPFewshotGymMetaLearningData(object):
 
                 dev_st = dev_ed
                 dev_ed = dev_ed + len(task["dev_examples"])
-                # dev_metadata_questions += [(i, i+1) for i in range(dev_st, dev_ed)]
                 dev_metadata_task.append((dev_st, dev_ed))
 
             train_outputs, train_metadata_questions = self.flatten(train_outputs)
             dev_outputs, dev_metadata_questions = self.flatten(dev_outputs)
-            
 
-            print("Printing Examples ...")
+            self.logger.info("Printing 3 examples")
             for i in range(3):
-                print(train_inputs[i])
-                print(train_outputs[i])
-                print()
-            for i in range(3):
-                print(dev_inputs[i])
-                print(dev_outputs[i])
-                print()
-
-            print(train_metadata_task[:5])
-            print(dev_metadata_task[:5])
-
-            # outputs, metadata = self.flatten(outputs) # what is metadata?
+                self.logger.info(dev_inputs[i])
+                self.logger.info(dev_outputs[i])
 
             if self.args.do_lowercase:
                 train_inputs = [input0.lower() for input0 in train_inputs]
@@ -192,20 +164,20 @@ class NLPFewshotGymMetaLearningData(object):
                 dev_inputs = ["<s> "+input0 for input0 in dev_inputs]
                 dev_outputs = ["<s> " +output0 for output0 in dev_outputs]
             
-            print("Tokenizing Train Input ...")
+            self.logger.info("Tokenizing Train Input ...")
             train_tokenized_input = tokenizer.batch_encode_plus(train_inputs,
                                                          pad_to_max_length=True,
                                                          max_length=self.args.max_input_length)
-            print("Tokenizing Train Output ...")
+            self.logger.info("Tokenizing Train Output ...")
             train_tokenized_output = tokenizer.batch_encode_plus(train_outputs,
                                                        pad_to_max_length=True,
                                                        max_length=self.args.max_output_length)
 
-            print("Tokenizing Dev Input ...")
+            self.logger.info("Tokenizing Dev Input ...")
             dev_tokenized_input = tokenizer.batch_encode_plus(dev_inputs,
                                                          pad_to_max_length=True,
                                                          max_length=self.args.max_input_length)
-            print("Tokenizing Dev Output ...")
+            self.logger.info("Tokenizing Dev Output ...")
             dev_tokenized_output = tokenizer.batch_encode_plus(dev_outputs,
                                                        pad_to_max_length=True,
                                                        max_length=self.args.max_output_length)
