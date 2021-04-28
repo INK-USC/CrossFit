@@ -64,23 +64,6 @@ def run(args, logger):
                                         num_training_steps=args.total_steps)
         train(args, logger, model, train_data, dev_data, optimizer, scheduler)
 
-    # if args.do_predict:
-    #     checkpoint = os.path.join(args.output_dir, args.predict_checkpoint)
-    #     def convert_to_single_gpu(state_dict):
-    #         def _convert(key):
-    #             if key.startswith('module.'):
-    #                 return key[7:]
-    #             return key
-    #         return {_convert(key):value for key, value in state_dict.items()}
-    #     model = MyBart.from_pretrained(args.model,
-    #                                    state_dict=convert_to_single_gpu(torch.load(checkpoint)))
-    #     logger.info("Loading checkpoint from {}".format(checkpoint))
-    #     if torch.cuda.is_available():
-    #         model.to(torch.device("cuda"))
-    #     model.eval()
-    #     ems = inference(model, dev_data, save_predictions=True, verbose=True)
-    #     logger.info("%s on %s data: %.2f" % (dev_data.metric, dev_data.data_type, np.mean(ems)*100))
-
 def train(args, logger, model, train_data, dev_data, optimizer, scheduler):
     model.train()
     global_step = 0

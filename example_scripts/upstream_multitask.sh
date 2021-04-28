@@ -1,6 +1,6 @@
 cd ..
 
-TASK_SPLIT=dataloader/custom_tasks_splits/default.json
+TASK_SPLIT=dataloader/custom_tasks_splits/random.json
 CUDA_VISIBLE_DEVICES=0 \
 python cli_multitask.py \
 --do_train \
