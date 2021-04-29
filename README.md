@@ -1,6 +1,6 @@
 ## The CrossFit Challenge :weight_lifting: and The NLP Few-shot Gym :sweat_drops:
 
-This repository contains code accomapnying our preprint paper "CrossFit :weight_lifting:: A Few-shot Learning Challenge for Cross-task Generalization in NLP" ([arXiv](https://arxiv.org/abs/2104.08835)).
+This repository contains code accompanying our preprint paper "CrossFit :weight_lifting:: A Few-shot Learning Challenge for Cross-task Generalization in NLP" ([arXiv](https://arxiv.org/abs/2104.08835)).
 
 ### Quick Links
 - [Configure Environment](#configure-environment)
@@ -145,7 +145,7 @@ We thank authors and crowd-workers of all resources used in our study! This work
 ***
 
 ### Contact Us
-If you find bugs in our code, encounter problems when running the code, or have suggestions for the CrossFit project, please reach out to Qinyuan (qinyuany@usc.edu) and Bill (yuchen.lin@usc.edu)!
+If you find bugs in our code, encounter problems when running the code, or have suggestions for the CrossFit project, please submit an issue, or reach out to Qinyuan (qinyuany@usc.edu) and Bill (yuchen.lin@usc.edu)!
 
 If you used our code in your study, or find our paper useful, please cite us:
 ```
