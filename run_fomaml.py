@@ -20,14 +20,10 @@ def run(args, logger):
     logger.info("Training on the following tasks: {}".format(train_tasks))
 
     train_data = NLPFewshotGymMetaLearningData(logger, args, args.train_dir, tasks=train_tasks, data_type="train", is_training=True)
-    # dev_data = NLPFewshotGymMetaLearningData(logger, args, args.train_dir, tasks=DEFAULT_SPLIT["dev"], data_type="dev", is_training=False)
     dev_data = None
 
     train_data.load_dataset(tokenizer)
     train_data.load_dataloader()
-
-    # dev_data.load_dataset(tokenizer)
-    # dev_data.load_dataloader()
 
     if args.do_train:
         if args.checkpoint is not None:
@@ -94,6 +90,7 @@ def train(args, logger, model, train_data, dev_data, optimizer, scheduler):
             with higher.innerloop_ctx(
                 model, 
                 inner_opt,
+                track_higher_grads=False,
                 copy_initial_weights=False
             ) as (fnet, diffopt):
                 # inner loop
@@ -109,7 +106,16 @@ def train(args, logger, model, train_data, dev_data, optimizer, scheduler):
                             decoder_input_ids=batch[6], decoder_attention_mask=batch[7],
                             is_training=True)
                 dev_losses.append(dev_loss.detach().cpu())
-                dev_loss.backward()
+
+                # instead of doing dev_loss.backward(), take gradient w.r.t. the latest fast parameters
+                # reference: https://github.com/facebookresearch/higher/issues/63
+                grads = torch.autograd.grad(dev_loss, fnet.parameters())
+
+                for p, g in zip(model.parameters(), grads):
+                    if p.grad is None:
+                        p.grad = g.detach()
+                    else:
+                        p.grad += g.detach()
 
             if global_batch % args.gradient_accumulation_steps == 0:
                 global_step += 1

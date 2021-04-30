@@ -26,7 +26,8 @@ import random
 import numpy as np
 import torch
 
-from run_maml import run
+from run_maml import run as run_maml
+from run_fomaml import run as run_fomaml
 
 def main():
     parser = argparse.ArgumentParser()
@@ -44,6 +45,8 @@ def main():
     ## Meta Learn parameters
     parser.add_argument('--inner_bsz', type=int, default=16)
     parser.add_argument('--inner_lr', type=float, default=3e-5)
+    parser.add_argument('--inner_step', type=int, default=1)
+    parser.add_argument("--method", default="maml")
     parser.add_argument('--custom_tasks_splits', type=str, default=None)
 
     ## Model parameters
@@ -135,7 +138,11 @@ def main():
             raise ValueError("If `do_predict` is True, then `predict_dir` must be specified.")
 
     logger.info("Using {} gpus".format(args.n_gpu))
-    run(args, logger)
+
+    if args.method == "maml":
+        run_maml(args, logger)
+    elif args.method == "fomaml":
+        run_fomaml(args, logger)
 
 if __name__=='__main__':
     main()
