@@ -5,7 +5,7 @@ CUDA_VISIBLE_DEVICES=0 \
 python cli_maml.py \
 --do_train \
 --learning_rate 1e-5 \
---output_dir models/upstream-maml \
+--output_dir models/upstream-maml-with-dev \
 --custom_tasks_splits ${TASK_SPLIT} \
 --total_steps 6000 \
 --warmup_steps 360 \

@@ -2,6 +2,7 @@ data/
 daily/
 models/
 tasks/full_datasets
+playground/
 
 
 # Byte-compiled / optimized / DLL files

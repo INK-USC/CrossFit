@@ -28,6 +28,7 @@ import torch
 
 from run_maml import run as run_maml
 from run_fomaml import run as run_fomaml
+from run_reptile import run as run_reptile
 
 def main():
     parser = argparse.ArgumentParser()
@@ -143,6 +144,8 @@ def main():
         run_maml(args, logger)
     elif args.method == "fomaml":
         run_fomaml(args, logger)
+    elif args.method == "reptile":
+        run_reptile(args, logger)
 
 if __name__=='__main__':
     main()

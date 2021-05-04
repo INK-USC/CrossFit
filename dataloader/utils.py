@@ -169,3 +169,89 @@ class MyMetaLearningDataLoader(DataLoader):
                 masks_for_this_batch = masks_for_this_rel[j: j+bsz]
 
                 yield self.dataset.relation_ids[idx], self.dataset.relation_mask[idx], input_ids_this_batch, masks_for_this_batch
+
+class MyReptileDataset(Dataset):
+    def __init__(self,
+                 input_ids, attention_mask, 
+                 decoder_input_ids, decoder_attention_mask,
+                 metadata_task, metadata_questions,
+                 inner_bsz, inner_step,
+                 is_training=False):
+
+        self.input_ids = torch.LongTensor(input_ids)
+        self.attention_mask = torch.LongTensor(attention_mask)
+
+        self.decoder_input_ids = torch.LongTensor(decoder_input_ids)
+        self.decoder_attention_mask = torch.LongTensor(decoder_attention_mask)
+
+        self.metadata_task = metadata_task
+        self.metadata_questions = metadata_questions
+
+        self.inner_bsz = inner_bsz
+        self.inner_step = inner_step
+
+        self.is_training = is_training
+
+        assert len(self.input_ids)==len(self.attention_mask)==self.metadata_task[-1][-1]
+        assert len(self.decoder_input_ids)==len(self.decoder_attention_mask)==self.metadata_questions[-1][-1]
+
+    def __len__(self):
+        return len(self.metadata_task)
+
+    def __getitem__(self, idx):
+        # create a dataloader for the current task on-the-fly
+        task_datasets = SimpleTextToTextDataset(idx,  \
+            self.input_ids, self.attention_mask, self.decoder_input_ids, self.decoder_attention_mask, \
+            self.metadata_task, self.metadata_questions)
+        task_dataloader = SimpleTextToTextDataloader(task_datasets, batch_size=self.inner_bsz, is_training=self.is_training)
+
+        ret_batches = []
+        for batch in task_dataloader:
+            input_ids, attention_mask, decoder_input_ids, decoder_attention_mask = batch
+            ret_batches.append((input_ids, attention_mask, decoder_input_ids, decoder_attention_mask))       
+
+        return ret_batches
+
+class MyReptileDataLoader(DataLoader):
+    def __init__(self, args, dataset, is_training):
+        if is_training:
+            sampler=RandomSampler(dataset)
+            batch_size = args.train_batch_size
+        else:
+            sampler=SequentialSampler(dataset)
+            batch_size = args.predict_batch_size
+
+        super(MyReptileDataLoader, self).__init__(dataset, sampler=sampler, batch_size=batch_size)
+        self.collate_fn = self.dummy_collate
+        self.args = args
+
+    def dummy_collate(self, input_data):
+        return input_data[0]
+
+class SimpleTextToTextDataset(Dataset):
+    def __init__(self, task_idx, input_ids, attention_mask, decoder_input_ids, decoder_attention_mask, metadata_task, metadata_questions):
+        self.input_ids = torch.LongTensor(input_ids)
+        self.attention_mask = torch.LongTensor(attention_mask)
+        self.decoder_input_ids = torch.LongTensor(decoder_input_ids)
+        self.decoder_attention_mask = torch.LongTensor(decoder_attention_mask)
+        self.metadata_task = torch.LongTensor(metadata_task)
+        self.metadata_questions = torch.LongTensor(metadata_questions)
+
+        self.task_idx = task_idx
+        self.st = self.metadata_task[task_idx][0]
+    
+        assert len(self.input_ids) == len(self.attention_mask) == self.metadata_task[-1][-1]
+        assert len(self.decoder_input_ids) == len(self.decoder_attention_mask) == self.metadata_questions[-1][-1]
+        
+    def __len__(self):
+        return self.metadata_task[self.task_idx][1] - self.metadata_task[self.task_idx][0]
+
+    def __getitem__(self, idx):
+        in_idx = idx + self.st
+        out_idx = np.random.choice(range(*self.metadata_questions[in_idx]))
+        return self.input_ids[in_idx], self.attention_mask[in_idx], self.decoder_input_ids[out_idx], self.decoder_attention_mask[out_idx]
+
+class SimpleTextToTextDataloader(DataLoader):
+    def __init__(self, dataset, batch_size, is_training):
+        sampler=RandomSampler(dataset)
+        super(SimpleTextToTextDataloader, self).__init__(dataset, sampler=sampler, batch_size=batch_size)

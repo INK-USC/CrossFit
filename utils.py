@@ -1,5 +1,4 @@
 import torch.nn as nn
-# from dataloader.default_split import DEFAULT_SPLIT
 import json
 
 def label_smoothed_nll_loss(lprobs, target, epsilon=0.1, ignore_index=-100):
