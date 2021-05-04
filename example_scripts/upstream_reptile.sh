@@ -1,11 +1,11 @@
 cd ..
 
 TASK_SPLIT=dataloader/custom_tasks_splits/random.json
-CUDA_VISIBLE_DEVICES=0 \
+CUDA_VISIBLE_DEVICES=2 \
 python cli_maml.py \
 --do_train \
 --learning_rate 1e-5 \
---output_dir models/upstream-fomaml-with-dev \
+--output_dir models/upstream-reptile-with-dev \
 --custom_tasks_splits ${TASK_SPLIT} \
 --total_steps 6000 \
 --warmup_steps 360 \
@@ -13,6 +13,6 @@ python cli_maml.py \
 --gradient_accumulation_steps 4 \
 --inner_bsz 16 \
 --inner_step 4 \
---method fomaml \
+--inner_lr 1e-5 \
+--method reptile \
 --num_train_epochs 40;
-

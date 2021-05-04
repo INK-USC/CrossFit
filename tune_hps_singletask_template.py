@@ -28,14 +28,14 @@ import torch
 
 import pandas as pd
 
-from run_singletask_template import run
+from run_singletask_template import run, ensemble_and_evaluate
 
 def main():
     parser = argparse.ArgumentParser()
 
-    # parser.add_argument("--template_ids", nargs="*", type=int, default=[])
-    parser.add_argument("--template_id", type=str, required=True)
-
+    parser.add_argument("--template_id_list", nargs="*", type=str, default=[], 
+                        help="List of templates to use.")
+    parser.add_argument("--template_id", type=str, required=False, default=None) # place holder
     ## Basic parameters
     parser.add_argument("--task_dir", default="data", required=True)
     parser.add_argument("--train_file", default="data", required=False)
@@ -162,25 +162,42 @@ def main():
         args.dev_file = os.path.join(args.task_dir, prefix + "_dev.tsv")
         args.test_file = os.path.join(args.task_dir, prefix + "_test.tsv")
 
-        best_dev_performance = -1.0
-        best_config = None
-        for lr in args.learning_rate_list:
-            for bsz in args.bsz_list:
-                logger.info("Running ... prefix={}, lr={}, bsz={} ...".format(prefix, lr, bsz))
-                args.learning_rate = lr
-                args.train_batch_size = bsz
-                dev_performance, test_performance = run(args, logger)
+        test_predictions_ensemble = []
+        # a list of predictions produced by different templates
 
-                logger.info("prefix={}, lr={}, bsz={}, dev_performance={}, test_performance={}".format(prefix, lr, bsz, dev_performance, test_performance))
-                df.loc[len(df.index)] = [prefix, lr, bsz, dev_performance, test_performance]
-                df.to_csv(os.path.join(args.output_dir, "result.csv"))
+        for template_id in args.template_id_list:
+            best_dev_performance = -1.0
+            best_config = None
+            best_test_predictions = None
+            for lr in args.learning_rate_list:
+                for bsz in args.bsz_list:
+                    logger.info("Running ... prefix={}, lr={}, bsz={} ...".format(prefix, lr, bsz))
 
-                if dev_performance > best_dev_performance:
-                    best_dev_performance = dev_performance
-                    best_config = [prefix, lr, bsz, dev_performance, test_performance]
+                    args.learning_rate = lr
+                    args.train_batch_size = bsz
+                    args.template_id = template_id
+                    dev_performance, test_performance, test_predictions = run(args, logger)
 
-        best_config[0] = best_config[0] + "_best"
-        df.loc[len(df.index)] = best_config
+                    logger.info("prefix={}, lr={}, bsz={}, dev_performance={}, test_performance={}".format(prefix, lr, bsz, dev_performance, test_performance))
+                    df.loc[len(df.index)] = [prefix, lr, bsz, dev_performance, test_performance]
+                    df.to_csv(os.path.join(args.output_dir, "result.csv"))
+
+                    if dev_performance > best_dev_performance:
+                        best_dev_performance = dev_performance
+                        best_config = [prefix, lr, bsz, dev_performance, test_performance]
+                        best_test_predictions = test_predictions
+            
+            best_config[0] = best_config[0] + "_best"
+            df.loc[len(df.index)] = best_config
+            df.to_csv(os.path.join(args.output_dir, "result.csv"))
+            logger.info("Test predictions: {}".format(test_predictions))
+            test_predictions_ensemble.append(test_predictions)
+
+        logger.info("Ensemble for {} ...".format(prefix))
+        logger.info("Test predictions ensemble: {}".format(test_predictions_ensemble))
+        test_performance = ensemble_and_evaluate(args, logger, test_predictions_ensemble)
+        config = [prefix + "_ensemble", 0.0, 0, 0, test_performance]
+        df.loc[len(df.index)] = config
         df.to_csv(os.path.join(args.output_dir, "result.csv"))
 
 if __name__=='__main__':

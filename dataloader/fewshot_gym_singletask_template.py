@@ -144,10 +144,11 @@ class NLPFewshotGymSingleTaskTemplateData(object):
         if do_return:
             return self.dataloader
 
-    def evaluate(self, predictions, verbose=False):
+    def evaluate(self, predictions, verbose=False, backward_flag=True):
         assert len(predictions)==len(self), (len(predictions), len(self))
-        predictions = [self.template_backward_func("", prediction.strip())[1] for prediction in predictions] # transform back
-        return evaluate(predictions, self.data, self.metric)
+        if backward_flag:
+            predictions = [self.template_backward_func("", prediction.strip())[1] for prediction in predictions] # transform back
+        return evaluate(predictions, self.data, self.metric), predictions
 
     def save_predictions(self, predictions):
         assert len(predictions)==len(self), (len(predictions), len(self))

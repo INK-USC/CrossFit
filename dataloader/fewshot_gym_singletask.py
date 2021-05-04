@@ -25,7 +25,6 @@ class NLPFewshotGymSingleTaskData(object):
         self.data = []
 
         self.task_name = "_".join(self.data_path.split("/")[-1].split("_")[:-3])
-        self.logger.info(self.task_name)
 
         with open(data_path) as fin:
             lines = fin.readlines()
@@ -33,8 +32,7 @@ class NLPFewshotGymSingleTaskData(object):
         # train_examples = []
         for line in lines:
             d = line.strip().split("\t")
-            self.data.append((d[0], d[1:]))
-            
+            self.data.append((d[0], d[1:]))    
 
         self.is_training = is_training
         self.load = not args.debug

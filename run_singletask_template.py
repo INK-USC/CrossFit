@@ -11,6 +11,7 @@ from bart import MyBart
 from utils import freeze_embeds, trim_batch
 
 from tqdm import tqdm
+from collections import Counter
 
 def run(args, logger):
     tokenizer = BartTokenizer.from_pretrained(args.model)
@@ -90,10 +91,11 @@ def run(args, logger):
         test_data.load_dataset(tokenizer)
         test_data.load_dataloader()
 
-        test_performance = inference(model, test_data, save_predictions=True, verbose=True)
+        test_performance, test_predictions = inference(model, test_data, save_predictions=True, verbose=True)
         logger.info("%s on %s data: %.2f" % (test_data.metric, test_data.data_type, test_performance))
 
-    return best_dev_performance, test_performance
+    return best_dev_performance, test_performance, test_predictions
+
 
 def train(args, logger, model, train_data, dev_data, optimizer, scheduler):
     model.train()
@@ -134,7 +136,7 @@ def train(args, logger, model, train_data, dev_data, optimizer, scheduler):
 
             if global_step % args.eval_period == 0:
                 model.eval()
-                curr_performance = inference(model if args.n_gpu==1 else model.module, dev_data)
+                curr_performance, _ = inference(model if args.n_gpu==1 else model.module, dev_data)
                 logger.info("Step %d Train loss %.2f %s %s on epoch=%d" % (
                         global_step,
                         np.mean(train_losses),
@@ -190,3 +192,29 @@ def inference(model, dev_data, save_predictions=False, verbose=False):
     if save_predictions:
         dev_data.save_predictions(predictions)
     return dev_data.evaluate(predictions, verbose=verbose)
+
+
+def find_majority(votes):
+    # reference: https://stackoverflow.com/questions/33511259/finding-majority-votes-on-1s-1s-and-0s-in-list-python
+    vote_count = Counter(votes)
+    top_two = vote_count.most_common(2)
+    if len(top_two)>1 and top_two[0][1] == top_two[1][1]:
+        return "unknown"
+    return top_two[0][0]
+
+def ensemble_and_evaluate(args, logger, test_predictions_ensemble):
+    # load test data
+    tokenizer = BartTokenizer.from_pretrained(args.model)
+    test_data = NLPFewshotGymSingleTaskTemplateData(logger, args, args.test_file, data_type="test", is_training=False)
+    test_data.load_dataset(tokenizer)
+    test_data.load_dataloader()
+
+    # get majority prediction from multiple models
+    final_predictions = []
+    for i in range(len(test_predictions_ensemble[0])):
+        preds_for_instance_i = []
+        for j in range(len(test_predictions_ensemble)):
+            preds_for_instance_i.append(test_predictions_ensemble[j][i])
+        final_predictions.append(find_majority(preds_for_instance_i))
+
+    return test_data.evaluate(final_predictions, backward_flag=False)[0]
