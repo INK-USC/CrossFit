@@ -2,6 +2,10 @@
 
 This repository contains code accompanying our preprint paper "CrossFit :weight_lifting:: A Few-shot Learning Challenge for Cross-task Generalization in NLP" ([arXiv](https://arxiv.org/abs/2104.08835)).
 
+CrossFit :weight_lifting: is a task setup which aims at building few-shot learners that generalize across diverse NLP tasks. For example, we explore whether models trained with _non-classification_ tasks becomes good few-shot learner for _classfication_ tasks; whether models trained with _non-MRC QA_ tasks becomes good few-shot learners for _MRC QA_ tasks.
+
+NLP Few-shot Gym :sweat_drops: is a repository of 160 different NLP tasks that we gather from existing open-access datasets. We manually create a two-level task ontology to analyze cross-task generalization in different settings.
+
 ### Quick Links
 - [Configure Environment](#configure-environment)
 - [Building the NLP Few-shot Gym](#building-the-nlp-few-shot-gym) :sweat_drops:
@@ -27,10 +31,12 @@ pip install git+https://github.com/huggingface/transformers.git@7b75aa9fa55bee57
 ***
 ### Building the NLP Few-shot Gym
 
+The following code will automatically prepare the data using :hugs: [huggingface datasets](https://github.com/huggingface/datasets), reconstruct the few-shot train/dev sets we sampled, and verify the files with MD5Sum. The processing will take roughly 3 hours.
+
 ```bash
-# Build the NLP Few-shot Gym (estimated time of completion: 3 hours)
-# --n_proc=10 means the tasks will be prosessed in parallel with 10 subprocesses. 
 cd tasks
+# Construct the gym
+# --n_proc=10 means the tasks will be prosessed in parallel with 10 subprocesses. 
 python _build_gym.py --build --n_proc=10
 # Verify with MD5Sum
 python _build_gym.py --verify
@@ -57,7 +63,7 @@ If you're a dataset owner and wish to update any part of it (description, citati
 :smiley: Please check `./example_scripts` for more examples!
 
 #### Fine-tune a single few-shot task
-Here we take BoolQ as an example. There are five different samples of train/dev for BoolQ in the directory `data/boolq/`. For _each_ sample, we do a grid search over learning rate (1e-5, 2e-5, 5e-5) and batch size (2, 4, 8). 
+Here we take BoolQ as an example. There are five different samples of train/dev sets for BoolQ in the directory `data/boolq/`. For _each_ sample, we do a grid search over learning rate (1e-5, 2e-5, 5e-5) and batch size (2, 4, 8). 
 This script will not save the final model, however the results will be logged in a csv file in `--output_dir`.
 
 ```bash
@@ -82,7 +88,9 @@ Notes:
 
 #### Upstream Learning
 
-We include two upstream learning methods: multi-task learning and MAML (model-agnostic meta-learning). We are currently working on first-order meta-learning algorithms!
+Upstream learning refers to the stage between general pre-training and down-stream fine-tuning. In this stage we allow access to a set of training tasks, and we test the few-shot learning ability on a set of test tasks after this stage. Please check Table 1 in our preprint paper for more details about task partitions.
+
+We include two upstream learning methods: multi-task learning and MAML (model-agnostic meta-learning). We are currently working on first-order meta-learning algorithms (First-order MAML and Reptile)!
 
 <details>
 <summary>Multi-task Learning</summary>
@@ -119,13 +127,21 @@ python cli_maml.py \
 --num_train_epochs 40;
 ```
 
-Note: MAML is memory intensive. The experiment above is done with a Quadro RTX 8000 GPU (48GB). If you want to reduce memory usage, please reduce `--inner_bsz`.
+MAML is memory intensive. The experiment above is done with a Quadro RTX 8000 GPU (48GB). If you want to reduce memory usage, please reduce `--inner_bsz`.
 
 </details>
+<br>
+
+Notes:
+- You can specify what tasks to use during upstream learning by creating a json file and passing it to `--custom_tasks_splits`.
+- The `--total_steps` in the scripts above are pre-computed so that the learning rate decreases to zero linearly during learning. We also pre-compute `--warmup_steps` to be 6% of the total steps.
 
 ***
 
 ### Download Our Checkpoints
+
+Here we provide the checkpoints after upstream learning.
+
 | Task Partition | Multi-task | Meta-learn |
 | ----------- | ----------- | ----------- |
 | 1. Random     | [multi-task-random-bart-base.pt](https://drive.google.com/file/d/1jz-hg5hvygeBSDpORw2Vq-a_a0KWfT4y/view?usp=sharing)       | [meta-learn-random-bart-base.pt](https://drive.google.com/file/d/1dPNaScWO3iktB5EZneDWr8ZSNq0DAuvT/view?usp=sharing)
@@ -133,9 +149,11 @@ Note: MAML is memory intensive. The experiment above is done with a Quadro RTX 8
 
 :smiley: Please stay tuned for more checkpoints!
 
-<!-- ***
+***
+
 ### Useful Tools
-:smiley: Please stay tuned! -->
+- `./example_scripts/finetune_a_list_of_tasks.sh` will help you fine-tune a list of tasks sequentially, given a certain model initialization.
+- `./example_scripts/collect_results.py` will read each `results.csv` files in a given directory, then compute mean and standard deviation of dev/test performance.
 
 ***
 
