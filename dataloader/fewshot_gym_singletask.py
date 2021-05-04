@@ -25,7 +25,6 @@ class NLPFewshotGymSingleTaskData(object):
         self.data = []
 
         self.task_name = "_".join(self.data_path.split("/")[-1].split("_")[:-3])
-        self.logger.info(self.task_name)
 
         with open(data_path) as fin:
             lines = fin.readlines()
