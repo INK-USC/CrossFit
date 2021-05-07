@@ -21,13 +21,15 @@ def run(args, logger):
     logger.info("Training on the following tasks: {}".format(train_tasks))
 
     train_data = NLPFewshotGymReptileData(logger, args, args.train_dir, tasks=train_tasks, data_type="train", is_training=True)
-    dev_data = NLPFewshotGymReptileData(logger, args, args.train_dir, tasks=dev_tasks, data_type="dev", is_training=False)
-
     train_data.load_dataset(tokenizer)
     train_data.load_dataloader()
 
-    dev_data.load_dataset(tokenizer)
-    dev_data.load_dataloader()
+    if args.no_dev:
+        dev_data = None
+    else:
+        dev_data = NLPFewshotGymReptileData(logger, args, args.train_dir, tasks=dev_tasks, data_type="dev", is_training=False)
+        dev_data.load_dataset(tokenizer)
+        dev_data.load_dataloader()
 
     if args.do_train:
         if args.checkpoint is not None:
@@ -124,14 +126,15 @@ def train(args, logger, model, train_data, dev_data, optimizer, scheduler):
                     logger.info("Epoch {} Train loss: {}".format(epoch, np.mean(train_losses)))
                     train_losses = []
 
-                    curr_dev_loss = inference(args, model, dev_data, epoch)
-                    logger.info("Epoch {} Dev loss: {}".format(epoch, curr_dev_loss))
-                    
-                    if curr_dev_loss < best_dev_loss:
-                        model_state_dict = {k:v.cpu() for (k, v) in model.state_dict().items()}
-                        torch.save(model_state_dict, os.path.join(args.output_dir, "best-model.pt"))
-                        logger.info("Dev loss: {:.2f} --> {:.2f}. Saving the best checkpoint... ".format(best_dev_loss, curr_dev_loss))
-                        best_dev_loss = curr_dev_loss
+                    if not args.no_dev:
+                        curr_dev_loss = inference(args, model, dev_data, epoch)
+                        logger.info("Epoch {} Dev loss: {}".format(epoch, curr_dev_loss))
+                        
+                        if curr_dev_loss < best_dev_loss:
+                            model_state_dict = {k:v.cpu() for (k, v) in model.state_dict().items()}
+                            torch.save(model_state_dict, os.path.join(args.output_dir, "best-model.pt"))
+                            logger.info("Dev loss: {:.2f} --> {:.2f}. Saving the best checkpoint... ".format(best_dev_loss, curr_dev_loss))
+                            best_dev_loss = curr_dev_loss
 
             if global_step >= args.total_steps:
                 stop_training = True

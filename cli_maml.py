@@ -49,6 +49,7 @@ def main():
     parser.add_argument('--inner_step', type=int, default=1)
     parser.add_argument("--method", default="maml")
     parser.add_argument('--custom_tasks_splits', type=str, default=None)
+    parser.add_argument("--no_dev", action='store_true', default=False)
 
     ## Model parameters
     parser.add_argument("--checkpoint", type=str)
