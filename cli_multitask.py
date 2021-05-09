@@ -26,7 +26,8 @@ import random
 import numpy as np
 import torch
 
-from run_multitask import run
+from run_multitask import run as run_bart
+from run_multitask_t5 import run as run_t5
 
 def main():
     parser = argparse.ArgumentParser()
@@ -91,6 +92,7 @@ def main():
                         help="random seed for initialization")
 
     parser.add_argument('--custom_tasks_splits', type=str, default=None)
+    parser.add_argument("--no_dev", action='store_true', default=False)
 
     args = parser.parse_args()
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir):
@@ -133,7 +135,11 @@ def main():
             raise ValueError("If `do_predict` is True, then `predict_dir` must be specified.")
 
     logger.info("Using {} gpus".format(args.n_gpu))
-    run(args, logger)
+
+    if "bart" in args.model:
+        run_bart(args, logger)
+    elif "t5" in args.model:
+        run_t5(args, logger)
 
 if __name__=='__main__':
     main()

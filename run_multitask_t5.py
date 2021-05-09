@@ -2,18 +2,18 @@ import os
 import numpy as np
 import torch
 
-from transformers import BartTokenizer, BartConfig
+from transformers import T5Tokenizer, T5Config
 from transformers import AdamW, get_linear_schedule_with_warmup
 
 from dataloader.fewshot_gym_multitask import NLPFewshotGymMultiTaskData
 
-from bart import MyBart
+from t5 import MyT5
 from utils import freeze_embeds, trim_batch, get_tasks_list
 
 from tqdm import tqdm
 
 def run(args, logger):
-    tokenizer = BartTokenizer.from_pretrained(args.model)
+    tokenizer = T5Tokenizer.from_pretrained(args.model)
 
     train_tasks = get_tasks_list(args.custom_tasks_splits, "train")
     logger.info("Training on the following tasks: {}".format(train_tasks))
@@ -40,10 +40,10 @@ def run(args, logger):
                         return key[7:]
                     return key
                 return {_convert(key):value for key, value in state_dict.items()}
-            model = MyBart.from_pretrained(args.model,
+            model = MyT5.from_pretrained(args.model,
                                            state_dict=convert_to_single_gpu(torch.load(args.checkpoint)))
         else:
-            model = MyBart.from_pretrained(args.model)
+            model = MyT5.from_pretrained(args.model)
 
         if args.freeze_embeds:
             logger.info("Freezing embeddings")
@@ -146,7 +146,7 @@ def inference(model, dev_data, save_predictions=False, verbose=False):
                                  attention_mask=batch[1],
                                  num_beams=dev_data.args.num_beams,
                                  max_length=dev_data.args.max_output_length,
-                                 decoder_start_token_id=model.config.decoder_start_token_id,
+                                 decoder_start_token_id=model.config.bos_token_id,
                                  early_stopping=dev_data.gen_early_stop,)
         for input_, output in zip(batch[0], outputs):
             pred = dev_data.decode(output)
