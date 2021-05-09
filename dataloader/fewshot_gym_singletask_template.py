@@ -33,7 +33,10 @@ class NLPFewshotGymSingleTaskTemplateData(object):
         # train_examples = []
         for line in lines:
             d = line.strip().split("\t")
-            self.data.append((d[0], d[1:]))    
+            self.data.append((d[0], d[1:]))   
+
+        if self.data_type == "test":
+            self.data = self.data[:10000] 
 
         self.is_training = is_training
         self.load = not args.debug
