@@ -115,7 +115,7 @@ def train(args, logger, model, train_data, dev_data, optimizer, scheduler):
                 scheduler.step()
                 model.zero_grad()
 
-            if global_step % args.eval_period == 0 and not args.no_dev:
+            if global_step % args.eval_period == 0:
                 model.eval()
                 logger.info("Step %d Train loss %.2f %s on epoch=%d" % (
                         global_step,

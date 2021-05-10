@@ -166,21 +166,25 @@ class NLPFewshotGymMetaLearningData(object):
             
             self.logger.info("Tokenizing Train Input ...")
             train_tokenized_input = tokenizer.batch_encode_plus(train_inputs,
-                                                         pad_to_max_length=True,
-                                                         max_length=self.args.max_input_length)
+                                                         max_length=self.args.max_input_length,
+                                                         padding='max_length',
+                                                         truncation=True)
             self.logger.info("Tokenizing Train Output ...")
             train_tokenized_output = tokenizer.batch_encode_plus(train_outputs,
-                                                       pad_to_max_length=True,
-                                                       max_length=self.args.max_output_length)
+                                                         max_length=self.args.max_output_length,
+                                                         padding='max_length',
+                                                         truncation=True)
 
             self.logger.info("Tokenizing Dev Input ...")
             dev_tokenized_input = tokenizer.batch_encode_plus(dev_inputs,
-                                                         pad_to_max_length=True,
-                                                         max_length=self.args.max_input_length)
+                                                         max_length=self.args.max_input_length,
+                                                         padding='max_length',
+                                                         truncation=True)
             self.logger.info("Tokenizing Dev Output ...")
             dev_tokenized_output = tokenizer.batch_encode_plus(dev_outputs,
-                                                       pad_to_max_length=True,
-                                                       max_length=self.args.max_output_length)
+                                                         max_length=self.args.max_output_length,
+                                                         padding='max_length',
+                                                         truncation=True)
 
             train_input_ids, train_attention_mask = train_tokenized_input["input_ids"], train_tokenized_input["attention_mask"]
             train_decoder_input_ids, train_decoder_attention_mask = train_tokenized_output["input_ids"], train_tokenized_output["attention_mask"]

@@ -3,18 +3,29 @@ import numpy as np
 import torch
 import higher
 
-from transformers import BartTokenizer, BartConfig
+from transformers import BartTokenizer, T5Tokenizer
 from transformers import AdamW, get_linear_schedule_with_warmup
 
-from dataloader.fewshot_gym_metalearn import NLPFewshotGymMetaLearningData
-
 from bart import MyBart
+from t5 import MyT5
+
+from dataloader.fewshot_gym_metalearn import NLPFewshotGymMetaLearningData
 from utils import freeze_embeds, trim_batch, get_tasks_list
 
 from tqdm import tqdm
 
+def get_model_and_tokenizer(model_name):
+    if "t5" in model_name:
+        return MyT5, T5Tokenizer
+    elif "bart" in model_name:
+        return MyBart, BartTokenizer
+    else:
+        raise Exception()
+        
 def run(args, logger):
-    tokenizer = BartTokenizer.from_pretrained(args.model)
+    MyModelClass, MyTokenizerClass = get_model_and_tokenizer(args.model)
+
+    tokenizer = MyTokenizerClass.from_pretrained(args.model)
 
     train_tasks = get_tasks_list(args.custom_tasks_splits, "train")
     dev_tasks = get_tasks_list(args.custom_tasks_splits, "dev")
@@ -39,10 +50,10 @@ def run(args, logger):
                         return key[7:]
                     return key
                 return {_convert(key):value for key, value in state_dict.items()}
-            model = MyBart.from_pretrained(args.model,
+            model = MyModelClass.from_pretrained(args.model,
                                            state_dict=convert_to_single_gpu(torch.load(args.checkpoint)))
         else:
-            model = MyBart.from_pretrained(args.model)
+            model = MyModelClass.from_pretrained(args.model)
 
         if args.freeze_embeds:
             logger.info("Freezing embeddings")
