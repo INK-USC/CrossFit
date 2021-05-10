@@ -26,8 +26,7 @@ import random
 import numpy as np
 import torch
 
-from run_multitask import run as run_bart
-from run_multitask_t5 import run as run_t5
+from run_multitask import run
 
 def main():
     parser = argparse.ArgumentParser()
@@ -136,10 +135,8 @@ def main():
 
     logger.info("Using {} gpus".format(args.n_gpu))
 
-    if "bart" in args.model:
-        run_bart(args, logger)
-    elif "t5" in args.model:
-        run_t5(args, logger)
+    run(args, logger)
+
 
 if __name__=='__main__':
     main()
