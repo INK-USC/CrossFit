@@ -44,6 +44,8 @@
         "wiqa"
     ],
     "dev": [
+    ],
+    "test": [
         "adversarialqa",
         "biomrc",
         "duorc",
@@ -53,6 +55,5 @@
         "squad-with_context",
         "superglue-record",
         "tweet_qa"
-    ],
-    "test": []
+    ]
 }

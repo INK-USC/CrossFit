@@ -61,10 +61,11 @@
         "yahoo_answers_topics",
         "yelp_polarity"],
     "dev": [
+    ],
+    "test": [
         "glue-mrpc",
         "glue-qqp",
         "medical_questions_pairs",
         "paws"
-    ],
-    "test": []
+    ]
 }

@@ -31,6 +31,8 @@
         "web_questions"
     ],
     "dev": [
+    ],
+    "test": [
         "ai2_arc",
         "aqua_rat",
         "codah",
@@ -53,6 +55,5 @@
         "swag",
         "wino_grande",
         "wiqa"
-    ],
-    "test": []
+    ]
 }

@@ -58,6 +58,6 @@
         "yahoo_answers_topics",
         "yelp_polarity"
     ],
-    "dev": ["anli", "glue-mnli", "glue-qnli", "glue-rte", "glue-wnli", "scitail", "sick", "superglue-cb"],
-    "test": []
+    "dev": [],
+    "test": ["anli", "glue-mnli", "glue-qnli", "glue-rte", "glue-wnli", "scitail", "sick", "superglue-cb"]
 }
