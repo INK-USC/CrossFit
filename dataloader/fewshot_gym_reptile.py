@@ -143,12 +143,14 @@ class NLPFewshotGymReptileData(object):
             
             self.logger.info("Tokenizing Input ...")
             tokenized_input = tokenizer.batch_encode_plus(inputs,
-                                                         pad_to_max_length=True,
-                                                         max_length=self.args.max_input_length)
+                                                         max_length=self.args.max_input_length,
+                                                         padding='max_length',
+                                                         truncation=True)
             self.logger.info("Tokenizing Output ...")
             tokenized_output = tokenizer.batch_encode_plus(outputs,
-                                                       pad_to_max_length=True,
-                                                       max_length=self.args.max_output_length)
+                                                       max_length=self.args.max_output_length,
+                                                       padding='max_length',
+                                                       truncation=True)
 
             input_ids, attention_mask = tokenized_input["input_ids"], tokenized_input["attention_mask"]
             decoder_input_ids, decoder_attention_mask = tokenized_output["input_ids"], tokenized_output["attention_mask"]
