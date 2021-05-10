@@ -77,7 +77,7 @@ def run(args, logger):
 
     if args.do_predict:
         if args.do_train and best_model_state_dict is not None:
-            model = MyBart.from_pretrained(args.model,
+            model = MyModelClass.from_pretrained(args.model,
                                        state_dict=best_model_state_dict)
             logger.info("Loading checkpoint from CPU")
         else:
@@ -88,7 +88,7 @@ def run(args, logger):
                         return key[7:]
                     return key
                 return {_convert(key):value for key, value in state_dict.items()}
-            model = MyBart.from_pretrained(args.model,
+            model = MyModelClass.from_pretrained(args.model,
                                         state_dict=convert_to_single_gpu(torch.load(checkpoint)))
             logger.info("Loading checkpoint from {}".format(checkpoint))
 
@@ -194,6 +194,7 @@ def inference(model, dev_data, save_predictions=False, verbose=False):
                                  attention_mask=batch[1],
                                  num_beams=dev_data.args.num_beams,
                                  max_length=dev_data.args.max_output_length,
+                                 decoder_start_token_id=model.config.decoder_start_token_id,
                                  early_stopping=dev_data.gen_early_stop,)
         for input_, output in zip(batch[0], outputs):
             pred = dev_data.decode(output)

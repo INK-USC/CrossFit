@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
 from transformers import T5ForConditionalGeneration, BartForConditionalGeneration
-from transformers.modeling_bart import shift_tokens_right
+from transformers.models.bart.modeling_bart import shift_tokens_right
 
 from utils import label_smoothed_nll_loss
 
