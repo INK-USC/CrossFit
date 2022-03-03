@@ -25,6 +25,7 @@ class MyBart(BartForConditionalGeneration):
         output_hidden_states=None,
         return_dict=None,
         is_training=False,
+        cross_attn_head_mask=None,
         ):
 
         if is_training:
@@ -47,6 +48,7 @@ class MyBart(BartForConditionalGeneration):
             output_attentions=output_attentions,
             output_hidden_states=output_hidden_states,
             return_dict=return_dict,
+            cross_attn_head_mask=cross_attn_head_mask,
         )
 
         # lm_logits = F.linear(outputs[0], self.model.shared.weight, bias=self.final_logits_bias)
