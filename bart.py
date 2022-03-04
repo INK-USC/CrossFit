@@ -14,18 +14,8 @@ class MyBart(BartForConditionalGeneration):
         attention_mask=None,
         decoder_input_ids=None,
         decoder_attention_mask=None,
-        head_mask=None,
-        decoder_head_mask=None,
-        encoder_outputs=None,
-        past_key_values=None,
-        inputs_embeds=None,
-        decoder_inputs_embeds=None,
-        use_cache=None,
-        output_attentions=None,
-        output_hidden_states=None,
-        return_dict=None,
         is_training=False,
-        cross_attn_head_mask=None,
+        **model_kwargs,
         ):
 
         if is_training:
@@ -38,17 +28,7 @@ class MyBart(BartForConditionalGeneration):
             attention_mask=attention_mask,
             decoder_input_ids=_decoder_input_ids,
             decoder_attention_mask=decoder_attention_mask,
-            head_mask=head_mask,
-            decoder_head_mask=decoder_head_mask,
-            encoder_outputs=encoder_outputs,
-            past_key_values=past_key_values,
-            inputs_embeds=inputs_embeds,
-            decoder_inputs_embeds=decoder_inputs_embeds,
-            use_cache=use_cache,
-            output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
-            return_dict=return_dict,
-            cross_attn_head_mask=cross_attn_head_mask,
+            **model_kwargs,
         )
 
         # lm_logits = F.linear(outputs[0], self.model.shared.weight, bias=self.final_logits_bias)
