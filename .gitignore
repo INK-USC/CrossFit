@@ -3,6 +3,8 @@ daily/
 models/
 tasks/full_datasets
 playground/
+data_json/
+tasks_more_shots/
 
 
 # Byte-compiled / optimized / DLL files

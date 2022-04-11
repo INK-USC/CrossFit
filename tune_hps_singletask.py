@@ -98,6 +98,7 @@ def main():
     # to tune
     parser.add_argument("--learning_rate_list", nargs="*", type=float, default=[])
     parser.add_argument("--bsz_list", nargs="*", type=int, default=[])
+    parser.add_argument("--memory_efficient", action='store_true', default=False)
     
     args = parser.parse_args()
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir):
@@ -166,6 +167,14 @@ def main():
                 logger.info("Running ... prefix={}, lr={}, bsz={} ...".format(prefix, lr, bsz))
                 args.learning_rate = lr
                 args.train_batch_size = bsz
+
+                if args.memory_efficient:
+                    # for bart large experiments on 2080 machines
+                    logger.info("Using memory efficient training: batch size={}, gradient accumulation={}, effective batch size={}".format(2, int(bsz/2), bsz))
+                    args.gradient_accumulation_steps = int(bsz/2)
+                    args.train_batch_size = 2
+                    args.predict_batch_size = 8
+
                 dev_performance, test_performance = run(args, logger)
 
                 logger.info("prefix={}, lr={}, bsz={}, dev_performance={}, test_performance={}".format(prefix, lr, bsz, dev_performance, test_performance))

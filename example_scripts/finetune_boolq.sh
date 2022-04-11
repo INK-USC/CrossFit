@@ -1,6 +1,6 @@
 cd ..
 
-CUDA_VISIBLE_DEVICES=2 \
+# CUDA_VISIBLE_DEVICES=2 \
 python cli_singletask.py \
 --train_file data/boolq/boolq_16_100_train.tsv \
 --dev_file data/boolq/boolq_16_100_dev.tsv \

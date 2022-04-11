@@ -92,6 +92,7 @@ def main():
 
     parser.add_argument('--custom_tasks_splits', type=str, default=None)
     parser.add_argument("--no_dev", action='store_true', default=False)
+    parser.add_argument("--reinitialize", action='store_true', default=False)
 
     args = parser.parse_args()
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir):

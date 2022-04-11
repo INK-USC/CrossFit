@@ -9,6 +9,7 @@ def main():
 
     parser.add_argument("--logs_dir", default=None, type=str, required=True)
     parser.add_argument("--output_file", default=None, type=str, required=True)
+    parser.add_argument("--postfix", default="_best", type=str)
 
     args = parser.parse_args()
 
@@ -30,7 +31,7 @@ def main():
         devs, tests = [], []
         
         for idx, row in df0.iterrows():
-            if row["prefix"].endswith("_best"):
+            if row["prefix"].endswith(args.postfix):
                 df.loc[len(df.index)] = [task, row["prefix"][:-5], row["dev_performance"], row["test_performance"]]
                 # print(row["prefix"], row["dev_performance"], row["test_performance"])
                 devs.append(row["dev_performance"])

@@ -110,6 +110,7 @@ def run(args, logger):
 def train(args, logger, model, train_data, dev_data, optimizer, scheduler):
     model.train()
     global_step = 0
+    global_batch = 0
     train_losses = []
     best_performance = -1.0
     stop_training=False
@@ -117,7 +118,7 @@ def train(args, logger, model, train_data, dev_data, optimizer, scheduler):
     logger.info("Starting training!")
     for epoch in range(int(args.num_train_epochs)):
         for batch in tqdm(train_data.dataloader, desc="Epoch {}".format(epoch), disable=args.quiet):
-            global_step += 1
+            global_batch += 1
             if torch.cuda.is_available():
                 batch = [b.to(torch.device("cuda")) for b in batch]
             
@@ -138,38 +139,39 @@ def train(args, logger, model, train_data, dev_data, optimizer, scheduler):
             train_losses.append(loss.detach().cpu())
             loss.backward()
 
-            if global_step % args.gradient_accumulation_steps == 0:
+            if global_batch % args.gradient_accumulation_steps == 0:
+                global_step += 1
                 torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
                 optimizer.step()    # We have accumulated enough gradients
                 scheduler.step()
                 model.zero_grad()
 
-            if global_step % args.eval_period == 0:
-                model.eval()
-                curr_performance = inference(model if args.n_gpu==1 else model.module, dev_data)
-                logger.info("Step %d Train loss %.2f %s %s on epoch=%d" % (
-                        global_step,
-                        np.mean(train_losses),
-                        dev_data.metric,
-                        curr_performance,
-                        epoch))
-                train_losses = []
-                if best_performance < curr_performance:
-                    best_model_state_dict = {k:v.cpu() for (k, v) in model.state_dict().items()}
-                    # model_state_dict = {k:v.cpu() for (k, v) in model.state_dict().items()}
-                    # torch.save(model_state_dict, os.path.join(args.output_dir, "best-model.pt"))
-                    logger.info("Not saving model with best %s: %s -> %s on epoch=%d, global_step=%d" % \
-                            (dev_data.metric, best_performance, curr_performance, epoch, global_step))
-                    best_performance = curr_performance
-                    wait_step = 0
-                    stop_training = False
-                else:
-                    wait_step += 1
-                    if wait_step >= args.wait_step:
-                        stop_training = True
-                        break
+                if global_step % args.eval_period == 0:
+                    model.eval()
+                    curr_performance = inference(model if args.n_gpu==1 else model.module, dev_data)
+                    logger.info("Step %d Train loss %.2f %s %s on epoch=%d" % (
+                            global_step,
+                            np.mean(train_losses),
+                            dev_data.metric,
+                            curr_performance,
+                            epoch))
+                    train_losses = []
+                    if best_performance < curr_performance:
+                        best_model_state_dict = {k:v.cpu() for (k, v) in model.state_dict().items()}
+                        # model_state_dict = {k:v.cpu() for (k, v) in model.state_dict().items()}
+                        # torch.save(model_state_dict, os.path.join(args.output_dir, "best-model.pt"))
+                        logger.info("Not saving model with best %s: %s -> %s on epoch=%d, global_step=%d" % \
+                                (dev_data.metric, best_performance, curr_performance, epoch, global_step))
+                        best_performance = curr_performance
+                        wait_step = 0
+                        stop_training = False
+                    else:
+                        wait_step += 1
+                        if wait_step >= args.wait_step:
+                            stop_training = True
+                            break
 
-                model.train()
+                    model.train()
 
             if global_step >= args.total_steps:
                 stop_training = True
@@ -201,7 +203,6 @@ def inference(model, dev_data, save_predictions=False, verbose=False):
             predictions.append(pred)
     if save_predictions:
         dev_data.save_predictions(predictions)
-    print(predictions)
     return dev_data.evaluate(predictions, verbose=verbose)
 
                                 #  decoder_start_token_id=model.config.decoder_start_token_id,

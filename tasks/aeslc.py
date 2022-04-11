@@ -14,7 +14,7 @@ class AESLC(FewshotGymTextToTextDataset):
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
-            lines.append(("summarize: " + datapoint["email_body"].replace("\n", " "), datapoint["subject_line"].replace("\n", " ")))
+            lines.append(("summarize: " + datapoint["email_body"].replace("\n", " ").replace("\r", " ").replace("\t", " "), datapoint["subject_line"].replace("\n", " ").replace("\r", " ").replace("\t", " ")))
         return lines
 
     def load_dataset(self):

@@ -41,6 +41,9 @@ class NLPFewshotGymMultiTaskData(object):
                 train_examples = []
                 for line in lines:
                     d = line.strip().split("\t")
+                    if len(d[1:]) == 0:
+                        print("empty line? {}: {}".format(prefix, d))
+                        continue
                     train_examples.append((d[0], d[1:]))
 
                 with open(os.path.join(task_dir, prefix + "_dev.tsv")) as fin:
@@ -49,6 +52,9 @@ class NLPFewshotGymMultiTaskData(object):
                 dev_examples = []
                 for line in lines:
                     d = line.strip().split("\t")
+                    if len(d[1:]) == 0:
+                        print("empty line? {}: {}".format(prefix, d))
+                        continue
                     dev_examples.append((d[0], d[1:]))
 
                 self.data.append({

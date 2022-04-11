@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import torch
+import math
 
 from transformers import BartTokenizer, T5Tokenizer
 from transformers import AdamW, get_linear_schedule_with_warmup
@@ -55,6 +56,10 @@ def run(args, logger):
                                            state_dict=convert_to_single_gpu(torch.load(args.checkpoint)))
         else:
             model = MyModelClass.from_pretrained(args.model)
+
+        if args.reinitialize:
+            for k, v in model.named_parameters():
+                v.data = 0.1 * torch.randn_like(v.data)
 
         if args.freeze_embeds:
             logger.info("Freezing embeddings")
@@ -117,10 +122,9 @@ def train(args, logger, model, train_data, dev_data, optimizer, scheduler):
 
             if global_step % args.eval_period == 0:
                 model.eval()
-                logger.info("Step %d Train loss %.2f %s on epoch=%d" % (
+                logger.info("Step %d Train loss %.2f on epoch=%d" % (
                         global_step,
                         np.mean(train_losses),
-                        dev_data.metric,
                         epoch))
                 train_losses = []
 
