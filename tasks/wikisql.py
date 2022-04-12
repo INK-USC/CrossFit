@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
+from utils import clean
 
 class WikiSQL(FewshotGymTextToTextDataset):
     
@@ -15,7 +16,7 @@ class WikiSQL(FewshotGymTextToTextDataset):
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
-            lines.append((datapoint["question"], datapoint["sql"]["human_readable"].strip()))
+            lines.append((clean(datapoint["question"]), datapoint["sql"]["human_readable"].strip()))
         return lines
 
     def load_dataset(self):

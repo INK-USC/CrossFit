@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
+from utils import clean
 
 id2alphabet = {0: "(A)", 1: "(B)", 2: "(C)", 3: "(D)", 4: "(E)"}
 
@@ -25,7 +26,7 @@ class CoS_E(FewshotGymTextToTextDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             choices_string, answer_string = self.get_choices_and_answer_string(datapoint)
-            lines.append((datapoint["question"] + choices_string, datapoint["abstractive_explanation"]))
+            lines.append((clean(datapoint["question"]) + choices_string, datapoint["abstractive_explanation"]))
         return lines
 
     def load_dataset(self):

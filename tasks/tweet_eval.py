@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
+from utils import clean
 
 class TweetEval(FewshotGymClassificationDataset):
     def __init__(self, subset_name):
@@ -49,12 +50,12 @@ class TweetEval(FewshotGymClassificationDataset):
         elif subset_name == "irony":
             self.label = {
                 0:"non-irony",
-                1:"hate",
+                1:"irony",
             }
         elif subset_name == "offensive":
             self.label = {
                 0:"non-offensive",
-                1:"hate",
+                1:"offensive",
             }
         elif subset_name == "sentiment":
             self.label = {
@@ -73,8 +74,8 @@ class TweetEval(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            if len(datapoint["text"].replace("\n", " ")):
-                lines.append((datapoint["text"].replace("\n", " "), self.label[datapoint["label"]]))
+            if len(clean(datapoint["text"])):
+                lines.append((clean(datapoint["text"]), self.label[datapoint["label"]]))
         return lines
 
     def load_dataset(self):

@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
+from utils import clean
 
 class SQuAD(FewshotGymTextToTextDataset):
     
@@ -16,9 +17,9 @@ class SQuAD(FewshotGymTextToTextDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             if self.mode == "with_context":
-                lines.append(("question: " + datapoint["question"] + " context: " + datapoint["context"], datapoint["answers"]["text"][0]))
+                lines.append(("question: " + datapoint["question"] + " context: " + clean(datapoint["context"]), "\t".join(list(set(datapoint["answers"]["text"])))))
             else:
-                lines.append(("question: " + datapoint["question"], datapoint["answers"]["text"][0]))
+                lines.append(("question: " + datapoint["question"], "\t".join(list(set(datapoint["answers"]["text"])))))
         return lines
 
     def load_dataset(self):

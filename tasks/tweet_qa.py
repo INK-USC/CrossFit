@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
+from utils import clean
 
 class TweetQA(FewshotGymTextToTextDataset):
 
@@ -15,8 +16,8 @@ class TweetQA(FewshotGymTextToTextDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             input_text = "question: " + datapoint["Question"] + " context: " + datapoint["Tweet"]
-            output_text = "\t".join(datapoint["Answer"])
-            lines.append((input_text, output_text))
+            output_text = "\t".join([clean(item) for item in datapoint["Answer"]])
+            lines.append((clean(input_text), output_text))
         return lines
 
     def load_dataset(self):

@@ -14,7 +14,7 @@ class Kilt_TREX(FewshotGymTextToTextDataset):
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
-            lines.append((datapoint["input"].replace("\n", " "), "\t".join([item["answer"] for item in datapoint["output"]])))
+            lines.append((datapoint["input"].replace("\n", " "), "\t".join(list(set([item["answer"] for item in datapoint["output"] if len(item["answer"])>0])))))
         return lines
 
     def load_dataset(self):

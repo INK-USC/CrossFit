@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
+from utils import clean
 
 class DBpedia14(FewshotGymClassificationDataset):
     def __init__(self):
@@ -44,7 +45,7 @@ class DBpedia14(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append((datapoint["content"].strip(), self.label[datapoint["label"]]))
+            lines.append((clean(datapoint["content"]), self.label[datapoint["label"]]))
         return lines
 
     def load_dataset(self):

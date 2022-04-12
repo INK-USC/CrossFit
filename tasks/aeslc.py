@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
+from utils import clean
 
 class AESLC(FewshotGymTextToTextDataset):
 
@@ -14,7 +15,7 @@ class AESLC(FewshotGymTextToTextDataset):
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
-            lines.append(("summarize: " + datapoint["email_body"].replace("\n", " "), datapoint["subject_line"].replace("\n", " ")))
+            lines.append(("summarize: " + clean(datapoint["email_body"]), clean(datapoint["subject_line"])))
         return lines
 
     def load_dataset(self):

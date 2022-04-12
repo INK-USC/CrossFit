@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
+from utils import clean
 
 class IMDB(FewshotGymClassificationDataset):
     def __init__(self):
@@ -26,7 +27,7 @@ class IMDB(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append((datapoint["text"], self.label[datapoint["label"]]))
+            lines.append((clean(datapoint["text"]), self.label[datapoint["label"]]))
         return lines
 
     def load_dataset(self):

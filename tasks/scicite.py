@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
+from utils import clean
 
 class SciCite(FewshotGymClassificationDataset):
 
@@ -21,7 +22,7 @@ class SciCite(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             input_text = datapoint["string"][datapoint["citeStart"]: datapoint["citeEnd"]] + " [SEP] " + datapoint["string"].replace("\n", " ") + " [SEP] " + datapoint["sectionName"]
-            lines.append((input_text, self.label[datapoint["label"]]))
+            lines.append((clean(input_text), self.label[datapoint["label"]]))
         return lines
 
     def load_dataset(self):

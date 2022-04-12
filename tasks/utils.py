@@ -9,3 +9,10 @@ def get_majority(lst):
         return None
     else:
         return rank[0][0]
+
+def clean(s):
+    # remove special characters
+    s = s.strip().replace("\n", " ").replace("\\n", " ").replace("\r", " ").replace("\t", " ")
+    # remove extra whitespaces
+    s = ' '.join(s.split())
+    return s

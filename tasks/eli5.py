@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
+from utils import clean
 
 class ELI5(FewshotGymTextToTextDataset):
 
@@ -27,8 +28,8 @@ class ELI5(FewshotGymTextToTextDataset):
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
-            input_text = datapoint["title"].replace("\n", " ").replace("\n", " ").replace("\r", " ").replace("\t", " ") + " [SEP] " + datapoint["selftext"].replace("\n", " ").replace("\r", " ").replace("\t", " ")
-            lines.append((input_text, "\t".join(item.replace("\n", " ").replace("\r", " ").replace("\t", " ") for item in datapoint["answers"]["text"])))
+            input_text = datapoint["title"] + " [SEP] " + datapoint["selftext"]
+            lines.append((clean(input_text), "\t".join(clean(item) for item in datapoint["answers"]["text"])))
         return lines
 
     def load_dataset(self):

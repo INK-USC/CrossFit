@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
+from utils import clean
 
 class SAMSum(FewshotGymTextToTextDataset):
 
@@ -16,7 +17,7 @@ class SAMSum(FewshotGymTextToTextDataset):
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
-            lines.append(("summarize: " + datapoint["dialogue"].replace("\r\n", " ").replace("\n", " "), datapoint["summary"].replace("\r\n", " ").replace("\n", " ")))
+            lines.append(("summarize: " + clean(datapoint["dialogue"]), clean(datapoint["summary"])))
         return lines
 
     def load_dataset(self):

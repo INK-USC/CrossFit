@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
+from utils import clean
 
 class Kilt_Fever(FewshotGymTextToTextDataset):
 
@@ -14,7 +15,7 @@ class Kilt_Fever(FewshotGymTextToTextDataset):
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
-            lines.append((datapoint["input"].replace("\n", " "), "\t".join([item["answer"] for item in datapoint["output"]])))
+            lines.append((clean(datapoint["input"]), "\t".join(list(set([item["answer"] for item in datapoint["output"]])))))
         return lines
 
     def load_dataset(self):

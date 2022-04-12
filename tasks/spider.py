@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
+from utils import clean
 
 class Spider(FewshotGymTextToTextDataset):
     
@@ -14,7 +15,7 @@ class Spider(FewshotGymTextToTextDataset):
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
-            lines.append((datapoint["question"], datapoint["query"]))
+            lines.append((clean(datapoint["question"]), clean(datapoint["query"])))
         return lines
 
     def load_dataset(self):

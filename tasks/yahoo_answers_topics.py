@@ -3,6 +3,7 @@ import datasets
 import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
+from utils import clean
 
 class YahooAnswersTopics(FewshotGymClassificationDataset):
     def __init__(self):
@@ -37,7 +38,7 @@ class YahooAnswersTopics(FewshotGymClassificationDataset):
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
             input_text = "question_title: " + datapoint["question_title"] + " [SEP] question_content: " + datapoint["question_content"] + " [SEP] best_answer: " + datapoint["best_answer"]
-            lines.append((input_text, self.label[datapoint["topic"]]))
+            lines.append((clean(input_text), self.label[datapoint["topic"]]))
         return lines
 
     def load_dataset(self):
