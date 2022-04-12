@@ -1,6 +1,6 @@
 ## The CrossFit Challenge :weight_lifting: and The NLP Few-shot Gym :sweat_drops:
 
-This repository contains code accompanying our preprint paper "CrossFit :weight_lifting:: A Few-shot Learning Challenge for Cross-task Generalization in NLP" ([arXiv](https://arxiv.org/abs/2104.08835)).
+This repository contains code accompanying our preprint paper "CrossFit :weight_lifting:: A Few-shot Learning Challenge for Cross-task Generalization in NLP" ([Paper](https://aclanthology.org/2021.emnlp-main.572/)).
 
 CrossFit :weight_lifting: is a task setup which aims at building few-shot learners that generalize across diverse NLP tasks. For example, we explore whether models trained with _non-classification_ tasks becomes good few-shot learner for _classfication_ tasks; whether models trained with _non-MRC QA_ tasks becomes good few-shot learners for _MRC QA_ tasks.
 
@@ -165,13 +165,23 @@ We thank authors and crowd-workers of all resources used in our study! This work
 ### Contact Us
 If you find bugs in our code, encounter problems when running the code, or have suggestions for the CrossFit project, please submit an issue, or reach out to Qinyuan (qinyuany@usc.edu) and Bill (yuchen.lin@usc.edu)!
 
-If you used our code in your study, or find our paper useful, please cite us:
+If you used our code in your study, or find our paper useful, please cite us with the bibkey `ye-etal-2021-crossfit` in the official ACL Anthology, or use the following BibTeX:
+
+<details>
+<summary>BibTeX</summary>
+
 ```
-@article{ye2021crossfit,
-  title={CrossFit: A Few-shot Learning Challenge for Cross-task Generalization in NLP},
-  author={Ye, Qinyuan and Lin, Bill Yuchen and Ren, Xiang},
-  journal={arXiv preprint arXiv:2104.08835},
-  year={2021}
+@article{ye-etal-2021-crossfit,
+    title = "{C}ross{F}it: A Few-shot Learning Challenge for Cross-task Generalization in {NLP}",
+    author = "Ye, Qinyuan and Lin, Bill Yuchen  and Ren, Xiang",
+    booktitle = "Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2021",
+    address = "Online and Punta Cana, Dominican Republic",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.emnlp-main.572",
+    doi = "10.18653/v1/2021.emnlp-main.572",
+    pages = "7163--7189",
 }
 ```
-
+</details>
