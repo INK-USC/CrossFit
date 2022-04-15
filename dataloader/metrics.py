@@ -260,7 +260,7 @@ def get_accruacy_over_list(prediction, groundtruth):
         if len(groundtruth)==0:
             return 0
         return np.max([accuracy(prediction, gt) for gt in groundtruth])
-    return accruacy(prediction, groundtruth)
+    return accuracy(prediction, groundtruth)
 
 def get_f1_over_list(prediction, groundtruth):
     if type(groundtruth)==list:

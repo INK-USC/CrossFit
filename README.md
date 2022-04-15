@@ -6,7 +6,7 @@ CrossFit :weight_lifting: is a task setup which aims at building few-shot learne
 
 NLP Few-shot Gym :sweat_drops: is a repository of 160 different NLP tasks that we gather from existing open-access datasets. We manually create a two-level task ontology to analyze cross-task generalization in different settings.
 
-[:memo: 2022-04-15] We found some formatting issue (mainly related unexpected `\t` charaters) during dataset processing. Several tasks may be affected. If you have used the previous version, please update the data files using the latest code.
+__[:memo: Update 2022-04-15]__ We found some formatting issue (mainly related unexpected `\t` characters) during dataset processing. Several tasks may be affected. If you have used the previous version, please update the data files using the latest code.
 
 ### Quick Links
 - [Configure Environment](#configure-environment)
@@ -25,7 +25,7 @@ NLP Few-shot Gym :sweat_drops: is a repository of 160 different NLP tasks that w
 conda create -n crossfit python=3.6.9
 conda activate crossfit
 # For building the NLP Few-shot Gym
-pip install datasets==1.4.0
+pip install datasets==1.4.0 py7zr wget
 # For reproducing the baseline methods
 pip install torch==1.1.0 higher==0.2.1 scikit-learn==0.24.1 scipy==1.4.1 rouge==1.0.0
 pip install git+https://github.com/huggingface/transformers.git@7b75aa9fa55bee577e2c7403301ed31103125a35
