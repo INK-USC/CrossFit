@@ -1,4 +1,4 @@
-ALL_TASKS = [   'acronym_identification.py',
+ALL_TASKS = ['acronym_identification.py',
     'ade_classification.py',
     'ade_dosage.py',
     'ade_effect.py',
