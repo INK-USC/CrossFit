@@ -6,6 +6,8 @@ CrossFit :weight_lifting: is a task setup which aims at building few-shot learne
 
 NLP Few-shot Gym :sweat_drops: is a repository of 160 different NLP tasks that we gather from existing open-access datasets. We manually create a two-level task ontology to analyze cross-task generalization in different settings.
 
+[:memo: 2022-04-15] We found some formatting issue (mainly related unexpected `\t` charaters) during dataset processing. Several tasks may be affected. If you have used the previous version, please update the data files using the latest code.
+
 ### Quick Links
 - [Configure Environment](#configure-environment)
 - [Building the NLP Few-shot Gym](#building-the-nlp-few-shot-gym) :sweat_drops:

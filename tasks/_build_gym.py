@@ -6,6 +6,9 @@ import subprocess
 import multiprocessing as mp
 from multiprocessing import Process, Manager
 
+import json
+from collections import OrderedDict
+
 from _md5sum import MD5SUM
 from _all_tasks import ALL_TASKS
 
@@ -18,6 +21,8 @@ def parse_args():
                         help="Construct data from hg datasets.")
     parser.add_argument('--verify', action='store_true',
                         help="Verify the datafiles with pre-computed MD5")
+    parser.add_argument('--compute', action='store_true',
+                        help="Compute MD5")
     parser.add_argument('--debug', action='store_true',
                         help="Run 2 tasks per process to test the code")
     
@@ -91,6 +96,25 @@ def get_md5(filename):
     digest = md5_hash.hexdigest()
     return digest
 
+def md5_compute(args):
+    md5_dict = OrderedDict()
+    subdirectories = sorted([x[0] for x in os.walk(args.output_dir)])
+    for subdirectory in subdirectories[1:]:
+        print("Computing {}".format(subdirectory))
+
+        files = sorted(os.listdir(subdirectory))
+        for filename in files:
+            if not filename.endswith(".tsv"):
+                continue
+
+            md5sum = get_md5(os.path.join(subdirectory, filename))
+
+            md5_dict[filename] = md5sum
+
+    with open("_md5sum.new.txt", "w") as fout:
+        json.dump(md5_dict, fout, indent="\t")
+
+
 def md5_verify(args):
     failed = []
     flags = {k: False for k in MD5SUM.keys()}
@@ -132,6 +156,8 @@ def main():
         build_gym(args)
     if args.verify:
         md5_verify(args)
+    if args.compute:
+        md5_compute(args)
 
 if __name__ == "__main__":
     main()
