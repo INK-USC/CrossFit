@@ -3,7 +3,7 @@ import numpy as np
 
 class FewshotGymDataset():
     def write_to_tsv(self, lst, out_file):
-        with open(out_file, "w") as fout:
+        with open(out_file, "w", encoding="utf-8") as fout:
             for line in lst:
                 fout.write("{}\t{}\n".format(line[0], line[1]))
 
