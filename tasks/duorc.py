@@ -23,7 +23,8 @@ class DuoRC(FewshotGymTextToTextDataset):
                 # datapoint["plot"] = datapoint["plot"].replace("This article's plot summary may be too long or excessively detailed. Please help improve it by removing unnecessary details and making it more concise.", "").strip(" ")
             # assert len(datapoint["answers"]) == 1
             input_text = "question: " + datapoint["question"] + " context: " + datapoint["plot"].replace("\n", " ")
-            lines.append((clean(input_text), "\t".join(list(set(datapoint["answers"])))))
+            answers = [clean(item) for item in list(set(datapoint["answers"]))]
+            lines.append((clean(input_text), "\t".join(answers)))
         return lines
 
     def load_dataset(self):
